@@ -55,7 +55,7 @@ def parse_args() -> tuple[int, int, bool, bool, bool, bool]:
 
     # Determine length
     if cvcv:
-        length = DEFAULT_LENGTH
+        length = 4
     else:
         try:
             length = int(args.length_or_pattern)
