@@ -54,7 +54,7 @@ id-gen cvcv
 
 ### 옵션
 
-- `length_or_pattern`: ID 길이 또는 'cvcv' 패턴 (기본값: 5)
+- `length_or_pattern`: ID 길이 (기본값: 5)
 - `-n, --count`: 생성할 ID 개수 (기본값: 1)
 - `-u, --uppercase`: 대문자 포함
 - `-s, --special`: 특수문자 포함

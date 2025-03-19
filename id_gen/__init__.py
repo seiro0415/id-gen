@@ -54,9 +54,6 @@ def get_char_pool(
     Returns:
         Character pool as a string
     """
-    if left_hand_only:
-        return LEFT_HAND_CHARS
-
     chars = ASCII + DIGITS
 
     if include_uppercase:
@@ -65,26 +62,29 @@ def get_char_pool(
     if include_special:
         chars += PUNCTUATION
 
+    if left_hand_only:
+        chars = "".join(filter(lambda c: c in LEFT_HAND_CHARS, chars))
+
     return chars
 
 
-def ensure_first_letter_alpha(id_str: str) -> str:
+def ensure_first_letter_alpha(id_str: str, char_pool: CharacterPool) -> str:
     """Ensure the first character is a letter."""
     if not id_str[0].isalpha():
         chars = list(id_str)
         # Replace first char with a random letter
-        chars[0] = random.choice(ASCII + ASCII.upper())
+        chars[0] = random.choice("".join(filter(lambda c: c.isalpha(), char_pool)))
         return "".join(chars)
     return id_str
 
 
-def ensure_has_digit(id_str: str) -> str:
+def ensure_has_digit(id_str: str, char_pool: CharacterPool) -> str:
     """Ensure the ID contains at least one digit."""
     if not any(c.isdigit() for c in id_str):
         # Replace a random character (not the first) with a digit
         chars = list(id_str)
         pos = random.randint(1, len(chars) - 1)
-        chars[pos] = random.choice(DIGITS)
+        chars[pos] = random.choice("".join(filter(lambda c: c.isdigit(), char_pool)))
         return "".join(chars)
     return id_str
 
@@ -111,7 +111,7 @@ def generate_cvcv_id(length: int) -> str:
         length: Length of the ID to generate
 
     Returns:
-        Generated ID with CVCV pattern
+        Generated CVCV ID
     """
     pattern = cycle([CONSONANTS, VOWELS])
     return "".join(random.choice(next(pattern)) for _ in range(length))
@@ -141,8 +141,15 @@ def create_id_generator(
     char_pool = get_char_pool(include_uppercase, include_special, left_hand_only)
     base_generator = partial(generate_random_id, char_pool=char_pool)
 
+    # Define constraints to be applied to the generated IDs
+    constraints = [
+        ensure_first_letter_alpha,
+        ensure_has_digit,
+    ]
+    constraints = [partial(f, char_pool=char_pool) for f in constraints]
+
     # Compose transformations to ensure constraints are met
-    return compose(ensure_has_digit, ensure_first_letter_alpha, base_generator)
+    return compose(*constraints, base_generator)
 
 
 def generate_ids(generator: Generator, length: int, count: int) -> list[str]:

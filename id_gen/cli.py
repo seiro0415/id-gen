@@ -26,7 +26,7 @@ def parse_args() -> tuple[int, int, bool, bool, bool, bool]:
         "length_or_pattern",
         nargs="?",
         default=str(DEFAULT_LENGTH),
-        help=f"Length of IDs to generate (min {MIN_LENGTH}) or 'cvcv' for CVCV pattern",
+        help=f"Length of IDs to generate (min {MIN_LENGTH})",
     )
 
     parser.add_argument(
@@ -96,6 +96,7 @@ def main():
 
     for id_str in ids:
         print(id_str)
+        print(f"[id-gen] Generated ID: {id_str}", file=sys.stderr)
 
 
 if __name__ == "__main__":
